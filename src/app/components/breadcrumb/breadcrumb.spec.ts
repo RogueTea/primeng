@@ -20,7 +20,7 @@ describe('Breadcrumb', () => {
     it('should display by default', () => {
         fixture.detectChanges();
 
-        const breadcrumbEl = fixture.debugElement.query(By.css('div')).nativeElement;
+        const breadcrumbEl = fixture.debugElement.query(By.css('nav')).nativeElement;
         expect(breadcrumbEl).toBeTruthy();
     });
 
@@ -29,7 +29,7 @@ describe('Breadcrumb', () => {
         breadcrumb.styleClass = 'Primeng ROCKS!';
         fixture.detectChanges();
 
-        const breadcrumbEl = fixture.debugElement.query(By.css('div'));
+        const breadcrumbEl = fixture.debugElement.query(By.css('nav'));
         expect(breadcrumbEl.nativeElement.className).toContain('Primeng ROCKS!');
         expect(breadcrumbEl.styles.height).toEqual('300px');
     });
@@ -52,13 +52,16 @@ describe('Breadcrumb', () => {
 
     it('should display items', () => {
         breadcrumb.home = { icon: 'pi pi-home' };
-        breadcrumb.model = [{ label: 'Squad' }, { label: 'Lionel Messi', url: 'https://en.wikipedia.org/wiki/Lionel_Messi', icon: 'pi pi-external-link' }];
+        breadcrumb.model = [{ label: 'Electronics' }, { label: 'Computer' }, { label: 'Accessories' }, { label: 'Keyboard' }, { label: 'Wireless' }];
         fixture.detectChanges();
 
-        const itemsEl = fixture.debugElement.query(By.css('ul'));
-        expect(itemsEl.children[2].children[0]).toBeTruthy();
-        expect(itemsEl.children[2].children[0].nativeElement.textContent).toEqual('Squad');
-        expect(itemsEl.children.length).toEqual(5);
+        const itemsEl = fixture.debugElement.queryAll(By.css('li a span')).map((element) => element.nativeElement);
+        expect(itemsEl[1].textContent).toEqual('Electronics');
+        expect(itemsEl[2].textContent).toEqual('Computer');
+        expect(itemsEl[3].textContent).toEqual('Accessories');
+        expect(itemsEl[4].textContent).toEqual('Keyboard');
+        expect(itemsEl[5].textContent).toEqual('Wireless');
+        expect(itemsEl.length).toEqual(6); // 5 items + home
     });
 
     it('should call itemClick when click home ', () => {
@@ -80,7 +83,7 @@ describe('Breadcrumb', () => {
         fixture.detectChanges();
 
         const itemClickSpy = spyOn(breadcrumb, 'onClick').and.callThrough();
-        const squadEl = fixture.debugElement.query(By.css('ul')).children[2].children[0].nativeElement;
+        const squadEl = fixture.debugElement.queryAll(By.css('li a span'))[1].nativeElement;
         squadEl.click();
         fixture.detectChanges();
 
@@ -93,7 +96,7 @@ describe('Breadcrumb', () => {
         fixture.detectChanges();
 
         const itemClickSpy = spyOn(breadcrumb, 'onClick').and.callThrough();
-        const messiEl = fixture.debugElement.query(By.css('ul')).children[4].children[0].nativeElement;
+        const messiEl = fixture.debugElement.queryAll(By.css('li a span'))[2].nativeElement;
         messiEl.click();
         fixture.detectChanges();
 
@@ -109,7 +112,7 @@ describe('Breadcrumb', () => {
         fixture.detectChanges();
 
         const itemClickSpy = spyOn(breadcrumb, 'onClick').and.callThrough();
-        const squadEl = fixture.debugElement.query(By.css('ul')).children[2].children[0].nativeElement;
+        const squadEl = fixture.debugElement.queryAll(By.css('li a span'))[1].nativeElement;
         squadEl.click();
         fixture.detectChanges();
 
@@ -130,7 +133,7 @@ describe('Breadcrumb', () => {
         fixture.detectChanges();
 
         const itemClickSpy = spyOn(breadcrumb, 'onClick').and.callThrough();
-        const squadEl = fixture.debugElement.query(By.css('ul')).children[2].children[0].nativeElement;
+        const squadEl = fixture.debugElement.queryAll(By.css('li a span'))[1].nativeElement;
         squadEl.click();
         fixture.detectChanges();
 
