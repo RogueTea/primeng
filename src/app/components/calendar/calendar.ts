@@ -2598,6 +2598,7 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
     constrainTime(hour: number, minute: number, second: number, pm: boolean) {
         let returnTimeTriple: number[] = [hour, minute, second];
         let minHoursExceeds12: boolean;
+        let maxHoursExceeds12: boolean;
         let value = this.value;
         const convertedHour = this.convertTo24Hour(hour, pm);
         const isRange = this.isRangeSelection(),
@@ -2618,6 +2619,7 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
         const valueDateString = value ? value.toDateString() : null;
         let isMinDate = this.minDate && valueDateString && this.minDate.toDateString() === valueDateString;
         let isMaxDate = this.maxDate && valueDateString && this.maxDate.toDateString() === valueDateString;
+        let isMinMaxSameDay = isMinDate && isMaxDate;
 
         if (isMinDate) {
             minHoursExceeds12 = this.minDate.getHours() >= 12;
@@ -2626,14 +2628,24 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
         switch (
             true // intentional fall through
         ) {
-            case isMinDate && minHoursExceeds12 && this.minDate.getHours() === 12 && this.minDate.getHours() > convertedHour:
+            // For the case where min date is the same as max date. Should loop through respecitive hours and minutes
+            case isMinMaxSameDay && (this.minDate.getHours() > convertedHour || convertedHour === 23) && convertedHour !== 0:
+                returnTimeTriple[0] = this.maxDate.getHours();
+                break;
+            case isMinMaxSameDay && (this.maxDate.getHours() < convertedHour || convertedHour === 0):
+                returnTimeTriple[0] = this.minDate.getHours();
+                break;
+
+            // this returns to 11 making easier for accessibility loop through
+            case isMinDate && minHoursExceeds12 && this.minDate.getHours() === 12 && this.minDate.getHours() > convertedHour && !isMinMaxSameDay:
                 returnTimeTriple[0] = 11;
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() > minute:
                 returnTimeTriple[1] = this.minDate.getMinutes();
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() === minute && this.minDate.getSeconds() > second:
                 returnTimeTriple[2] = this.minDate.getSeconds();
                 break;
-            case isMinDate && !minHoursExceeds12 && this.minDate.getHours() - 1 === convertedHour && this.minDate.getHours() > convertedHour:
+
+            case isMinDate && !minHoursExceeds12 && this.minDate.getHours() - 1 === convertedHour && this.minDate.getHours() > convertedHour && !isMinMaxSameDay:
                 returnTimeTriple[0] = 11;
                 this.pm = true;
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() > minute:
@@ -2650,6 +2662,7 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() === minute && this.minDate.getSeconds() > second:
                 returnTimeTriple[2] = this.minDate.getSeconds();
                 break;
+
             case isMinDate && this.minDate.getHours() > convertedHour:
                 returnTimeTriple[0] = this.minDate.getHours();
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() > minute:
@@ -2657,6 +2670,7 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
             case isMinDate && this.minDate.getHours() === convertedHour && this.minDate.getMinutes() === minute && this.minDate.getSeconds() > second:
                 returnTimeTriple[2] = this.minDate.getSeconds();
                 break;
+
             case isMaxDate && this.maxDate.getHours() < convertedHour:
                 returnTimeTriple[0] = this.maxDate.getHours();
             case isMaxDate && this.maxDate.getHours() === convertedHour && this.maxDate.getMinutes() < minute:

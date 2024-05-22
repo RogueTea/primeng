@@ -8,7 +8,7 @@ import { Code } from '@domain/code';
             <p>Boundaries for the permitted dates that can be entered are defined with <i>minDate</i> and <i>maxDate</i> properties.</p>
         </app-docsectiontext>
         <div class="card flex justify-content-center">
-            <p-calendar [(ngModel)]="date" [minDate]="minDate" [maxDate]="maxDate" [readonlyInput]="true" />
+            <p-calendar [(ngModel)]="date" [minDate]="minDate" [maxDate]="maxDate" [readonlyInput]="true" timeOnly="true" hourFormat="24" />
         </div>
         <app-code [code]="code" selector="calendar-minmax-demo"></app-code>
     `
@@ -21,19 +21,13 @@ export class MinMaxDoc {
     maxDate: Date | undefined;
 
     ngOnInit() {
-        let today = new Date();
-        let month = today.getMonth();
-        let year = today.getFullYear();
-        let prevMonth = month === 0 ? 11 : month - 1;
-        let prevYear = prevMonth === 11 ? year - 1 : year;
-        let nextMonth = month === 11 ? 0 : month + 1;
-        let nextYear = nextMonth === 0 ? year + 1 : year;
+        this.date = new Date();
         this.minDate = new Date();
-        this.minDate.setMonth(prevMonth);
-        this.minDate.setFullYear(prevYear);
+        this.minDate.setHours(0);
+        this.minDate.setMinutes(0);
         this.maxDate = new Date();
-        this.maxDate.setMonth(nextMonth);
-        this.maxDate.setFullYear(nextYear);
+        this.maxDate.setHours(12);
+        // this.maxDate.setMinutes(30);
     }
 
     code: Code = {
