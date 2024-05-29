@@ -2680,8 +2680,8 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
                 newPM = !this.pm;
             }
             newHour = newHour >= 13 ? newHour - 12 : newHour;
+            this.toggleAMPMIfNotMinDate(newPM);
         }
-        this.toggleAMPMIfNotMinDate(newPM);
         [this.currentHour, this.currentMinute, this.currentSecond] = this.constrainTime(newHour, this.currentMinute!, this.currentSecond!, newPM!);
         event.preventDefault();
     }
@@ -2764,8 +2764,8 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
                 newPM = !this.pm;
             }
             newHour = newHour <= 0 ? 12 + newHour : newHour;
+            this.toggleAMPMIfNotMinDate(newPM);
         }
-        this.toggleAMPMIfNotMinDate(newPM);
         [this.currentHour, this.currentMinute, this.currentSecond] = this.constrainTime(newHour, this.currentMinute!, this.currentSecond!, newPM!);
         event.preventDefault();
     }
