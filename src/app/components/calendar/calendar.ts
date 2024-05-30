@@ -1164,7 +1164,15 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
         return this.currentView === 'year' ? this.getTranslation('nextDecade') : this.currentView === 'month' ? this.getTranslation('nextYear') : this.getTranslation('nextMonth');
     }
 
-    constructor(@Inject(DOCUMENT) private document: Document, public el: ElementRef, public renderer: Renderer2, public cd: ChangeDetectorRef, private zone: NgZone, private config: PrimeNGConfig, public overlayService: OverlayService) {
+    constructor(
+        @Inject(DOCUMENT) private document: Document,
+        public el: ElementRef,
+        public renderer: Renderer2,
+        public cd: ChangeDetectorRef,
+        private zone: NgZone,
+        private config: PrimeNGConfig,
+        public overlayService: OverlayService
+    ) {
         this.window = this.document.defaultView as Window;
     }
 
@@ -2680,16 +2688,27 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
                 newPM = !this.pm;
             }
             newHour = newHour >= 13 ? newHour - 12 : newHour;
-            this.toggleAMPMIfNotMinDate(newPM);
+            this.toggleAMPMTimeConstraint(newPM);
         }
         [this.currentHour, this.currentMinute, this.currentSecond] = this.constrainTime(newHour, this.currentMinute!, this.currentSecond!, newPM!);
         event.preventDefault();
     }
 
-    toggleAMPMIfNotMinDate(newPM: boolean) {
-        let value = this.value;
+    toggleAMPMTimeConstraint(newPM: boolean) {
+        let value;
+        if (this.isRangeSelection()) {
+            value = this.value[1] || this.value[0];
+        } else if (this.isMultipleSelection()) {
+            value = this.value[this.value.length - 1];
+        } else {
+            value = this.value;
+        }
         const valueDateString = value ? value.toDateString() : null;
         let isMinDate = this.minDate && valueDateString && this.minDate.toDateString() === valueDateString;
+        let isMaxDate = this.maxDate && valueDateString && this.maxDate.toDateString() === valueDateString;
+        if (isMaxDate && this.maxDate.getHours() < 12) {
+            this.pm = false;
+        }
         if (isMinDate && this.minDate.getHours() >= 12) {
             this.pm = true;
         } else {
@@ -2764,7 +2783,7 @@ export class Calendar implements OnInit, OnDestroy, ControlValueAccessor {
                 newPM = !this.pm;
             }
             newHour = newHour <= 0 ? 12 + newHour : newHour;
-            this.toggleAMPMIfNotMinDate(newPM);
+            this.toggleAMPMTimeConstraint(newPM);
         }
         [this.currentHour, this.currentMinute, this.currentSecond] = this.constrainTime(newHour, this.currentMinute!, this.currentSecond!, newPM!);
         event.preventDefault();
