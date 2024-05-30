@@ -817,7 +817,7 @@ export class InputMask implements OnInit, ControlValueAccessor {
     }
 
     handleInputChange(event: Event) {
-        if (this.readonly) {
+        if (this.readonly || this.disabled) {
             return;
         }
 

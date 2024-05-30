@@ -4054,7 +4054,8 @@ export class ResizableColumn implements AfterViewInit, OnDestroy {
 @Directive({
     selector: '[pReorderableColumn]',
     host: {
-        class: 'p-element'
+        class: 'p-element',
+        '[style.cursor]': 'isEnabled() ? "move" : "default"'
     }
 })
 export class ReorderableColumn implements AfterViewInit, OnDestroy {
@@ -5394,6 +5395,8 @@ export class ColumnFilter implements AfterContentInit {
 
     overlayId: any;
 
+    applyHasBeenClicked: boolean = false;
+
     get fieldConstraints(): FilterMetadata[] | undefined | null {
         return this.dt.filters ? <FilterMetadata[]>this.dt.filters[<string>this.field] : null;
     }
@@ -5648,6 +5651,10 @@ export class ColumnFilter implements AfterContentInit {
     }
 
     onEscape() {
+        if (this.hasFilterNotBeenApplied()) {
+            this.clearFilter();
+        }
+        this.applyHasBeenClicked = false;
         this.overlayVisible = false;
         this.icon?.nativeElement.focus();
     }
@@ -5748,6 +5755,10 @@ export class ColumnFilter implements AfterContentInit {
         return false;
     }
 
+    hasFilterNotBeenApplied(): boolean {
+        return this.hasFilter() && !this.applyHasBeenClicked;
+    }
+
     isOutsideClicked(event: any): boolean {
         return !(
             DomHandler.hasClass(this.overlay?.nextElementSibling, 'p-overlay') ||
@@ -5822,6 +5833,10 @@ export class ColumnFilter implements AfterContentInit {
     }
 
     hide() {
+        if (this.hasFilterNotBeenApplied()) {
+            this.clearFilter();
+        }
+        this.applyHasBeenClicked = false;
         this.overlayVisible = false;
         this.cd.markForCheck();
     }
@@ -5834,12 +5849,14 @@ export class ColumnFilter implements AfterContentInit {
     }
 
     clearFilter() {
+        this.applyHasBeenClicked = false;
         this.initFieldFilterConstraint();
         this.dt._filter();
         if (this.hideOnClear) this.hide();
     }
 
     applyFilter() {
+        this.applyHasBeenClicked = true;
         this.dt._filter();
         this.hide();
     }
